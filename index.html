@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de usuarios con arreglos asociativos - Leonard Pirela</title>
+</head>
+<body>
+    
+    <h1>Registro de tres Usuarios</h1>
+    <h3>En arreglos Asociativos - Leonard Pirela</h3>
+    <hr><br>
+
+    <form id="formularioRegistro" method="post" onsubmit="return false;">
+        <label for="fnombre">Nombres:</label><br>
+        <input type="text" id="fnombre" name="nombre"><br><br>
+        
+        <label for="fapellido">Apellidos:</label><br>
+        <input type="text" id="fapellido" name="apellido"><br><br>
+
+        <label for="fcedula">Cedula:</label><br>
+        <input type="number" id="fcedula" name="cedula" min="0" step="1"><br><br>
+
+        <label for="fsueldo">Sueldo:</label><br>
+        <input type="number" id="fsueldo" name="sueldo"><br><br>
+
+        <label for="fdepartamento">Departamento:</label><br>
+        <input type="text" id="fdepartamento" name="departamento"><br><br>
+
+        <label for="ftrabajo">Lugar de trabajo:</label><br>
+        <input type="text" id="ftrabajo" name="trabajo"><br><br>
+
+        <button onclick="registrarUsuario();">Registrar Usuario</button><br><br>
+        <button onclick="registrarUsuario(true);">Reiniciar</button>
+    </form>
+
+    <br><br>
+
+    <div>
+    <table style="border: 1px solid #000; text-align: center;">
+    <tbody id="tablaUsuarios">
+    
+    </tbody>
+    </table>    
+    </div>
+
+    <script language="javascript">
+        function registrarUsuario (reiniciar) {
+
+        var formularioDatos = new FormData (document.getElementById("formularioRegistro"));
+        if (reiniciar==true){
+            formularioDatos.append("reiniciar", "true");
+            document.getElementById("tablaUsuarios").innerHTML = "";
+        }
+
+        var solicitudHttp = new XMLHttpRequest ();
+        solicitudHttp.onreadystatechange = function () {
+       
+        if (this.readyState == 4 && this.status == 200) {
+            
+            if (this.response != ""){
+
+            if (JSON.parse(this.response) == 1) {alert("Datos Incompletos");}
+            else if (JSON.parse(this.response) == 2) {alert("Maxima Cantidad de Usuarios Alcanzada"); }
+            else if (JSON.parse(this.response) == 3) {alert("Programa reiniciado"); console.clear();}
+            
+            else {
+                var respuestaJson = JSON.parse(this.response);
+                console.log(this.response);
+                
+                
+               var tabla = document.getElementById("tablaUsuarios");
+               tabla.setAttribute("border","2");
+               
+               tabla.innerHTML = "<tr><th>Nombre</th><th>Apellido</th><th>Cedula</th><th>Trabajo</th><th>Departamento</th><th>Sueldo</th></tr>";
+
+               respuestaJson.forEach(usuario => {
+
+                 var fila = document.createElement("tr");
+                 var nombre = document.createElement("td");
+                 var textoCelda = document.createTextNode(usuario['nombre']);
+                 nombre.appendChild(textoCelda); 
+                 fila.appendChild(nombre);
+
+                 var apellido = document.createElement("td"); 
+                 var textoCelda = document.createTextNode(usuario['apellido']);
+                 apellido.appendChild(textoCelda);
+                 fila.appendChild(apellido);
+
+                 var cedula = document.createElement("td"); 
+                 var textoCelda = document.createTextNode(usuario['cedula']);
+                 cedula.appendChild(textoCelda);
+                 fila.appendChild(cedula);
+
+                 var trabajo = document.createElement("td"); 
+                 var textoCelda = document.createTextNode(usuario['trabajo']);
+                 trabajo.appendChild(textoCelda);
+                 fila.appendChild(trabajo);
+
+                 var departamento= document.createElement("td"); 
+                 var textoCelda = document.createTextNode(usuario['departamento']);
+                 departamento.appendChild(textoCelda);
+                 fila.appendChild(departamento);
+
+                 var sueldo = document.createElement("td"); 
+                 var textoCelda = document.createTextNode(usuario['sueldo']);
+                 sueldo.appendChild(textoCelda);
+                 fila.appendChild(sueldo);
+                
+                 tabla.appendChild(fila);
+
+
+               });
+                
+                }
+            
+            }
+        }
+     };
+
+        document.getElementById("formularioRegistro").reset();
+        solicitudHttp.open("POST", "registroUsuarios.php");
+        solicitudHttp.send(formularioDatos);
+
+    }
+    </script>
+
+</body>
+</html>
